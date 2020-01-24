@@ -10,62 +10,90 @@ HEX
 
 DECIMAL
 
-20 CONSTANT RED_LED_A
-21 CONSTANT YELLOW_LED_A
-26 CONSTANT GREEN_LED_A
+20 CONSTANT RED_CAR_LED
+21 CONSTANT YELLOW_CAR_LED
+26 CONSTANT GREEN_CAR_LED
 
-19 CONSTANT RED_LED_P
-13 CONSTANT YELLOW_LED_P
-6  CONSTANT GREEN_LED_P
+19 CONSTANT RED_PED_LED
+13 CONSTANT YELLOW_PED_LED
+6  CONSTANT GREEN_PED_LED
 
 5  CONSTANT BUTTON
 
-\ SET_GPIO_OUTPUT ( n -- ) takes GPIO pin number and set the corresponding bit of GPFSELN register where N is the register number which controls the GPIO.
-\ N is calculated multipling the quotient of 10 division by 4 and add the result to GPFSEL0 ( e.g. GPIO 21 is controlled by GPFSEL2 so 21 / 10 --> GPFSEL0 + 8 = GPFSEL2 )
-\ A Mask is used to clear the 3 bits of GPFSEL register which controls GPIO states using INVERT AND 
-\   ( mask is obtained by left shifting 7 (111 binary ) by 3 * (remainder of 10 division), e.g 21 / 10 -> 3 * 1 -> 7 left shifted by 3 ).
-\ The GPFSELN bit which controls GPIO output is set by the OR operation between the current value of GPFSELN, cleared by the mask, and a 1 left shifted by GPIO number position
+\ GPIO ( n -- n ) takes GPIO pin number and test if is lower then 27 otherwise abort
+: GPIO DUP 30 > IF ABORT THEN ;
+
+\ MODE ( n -- a b c) takes GPIO pin number and leaves on the stack the number of left shift bit (a) required to set the corresponding GPIO control bits of GPFSELN,
+\  where N is the register number, along with the GPFSELN register address (b) and the current value stored at (c) cleared by a MASK;
+\ N ad (a) are calculated by dividing GPIO number by 10; N is the quotient multiplied by 4 while a is the reminder. Then GPFSELN is calculated by GPFSEL0 + N
+\ ( e.g. GPIO 21 is controlled by GPFSEL2 so 21 / 10 --> N = 2 * 4, a = 1 --> GPFSEL0 + 8 = GPFSEL2 )
+\ MASK is used to clear the 3 bits of GPFSEL register which controls GPIO states using INVERT AND and the value (a)
+\ The mask is obtained by left shifting 7 (111 binary ) by 3 * (remainder of 10 division), e.g 21 / 10 -> 3 * 1 -> 7 left shifted by 3 ).
+: MODE 10 /MOD 4 * GPFSEL0 + SWAP 3 * DUP 7 SWAP LSHIFT ROT DUP @ ROT INVERT AND ROT ;
+
+\ OUTPUT (a b c -- ) taskes the output of MODE and then set the GPFSELN register of the corresponding GPIO as output.
+\ The GPFSELN bit which controls GPIO output is set by the OR operation between the current value of GPFSELN, cleared by the mask, and a 1 left shifted by the reminder of 10
+\ division multiplyed by 3. (001 value in the corresponding bit position of GPFSELN set GPIO as OUTPUT)
 \ e.g with GPIO 21 AND @GPFSEL2: 011010--> 111000 011010 INVERT AND --> 000010 001000 OR --> 001010
+: OUTPUT 1 SWAP LSHIFT OR SWAP ! ;
 
-: SET_GPIO_OUTPUT 10 /MOD 4 * GPFSEL0 + SWAP 3 * 1 SWAP DUP ROT SWAP LSHIFT 7 ROT LSHIFT ROT DUP @ ROT INVERT AND ROT OR SWAP ! ;
-: SET_GPIO_INPUT 10 /MOD 4 * GPFSEL0 + SWAP 3 * 7 SWAP LSHIFT SWAP DUP @ ROT INVERT AND ! ;
+\ INPUT (a b c -- ) taskes the output of MODE and then set the GPFSELN register of the corresponding GPIO as input.
+\ Same as OUTPUT but drop the not necessary shift value and the GPFSELN bit which controls GPIO input is set by the 
+\ INVERT AND operation between the current value of GPFSELN, cleared by the mask,
+: INPUT DROP INVERT AND SWAP ! ;
 
+\ ON ( n -- ) takes GPIO pin number, left shift 1 by this number and set the corresponding bit of GPCLR0 register
+: ON 1 SWAP LSHIFT GPCLR0 ! ;
 
-\ SET_GPIO_ON ( n -- ) takes GPIO pin number, left shift 1 by this number and set the corresponding bit of GPCLR0 register
-: SET_GPIO_ON 1 SWAP LSHIFT GPCLR0 ! ;
+\ OFF ( n -- ) takes GPIO pin number, left shift 1 by this number and set the corresponding bit of GPSET0 register
+: OFF 1 SWAP LSHIFT GPSET0 ! ;
 
-\ SET_GPIO_ON ( n -- ) takes GPIO pin number, left shift 1 by this number and set the corresponding bit of GPSET0 register
-: SET_GPIO_OFF 1 SWAP LSHIFT GPSET0 ! ;
-
-\ SET_GPIO_ON ( n -- b ) takes GPIO pin number, left shift 1 by this number, get current value of GPLEV0 register and leaves on the stack the value of the corresponding GPIO pin number bit
-: GET_GPIO_LEV 1 SWAP LSHIFT GPLEV0 @ SWAP AND ;
-
-\ INIT_OUTPUT ( n -- ) set the output state to the semaphore's GPIO.
-: INIT_OUTPUT RED_LED_A SET_GPIO_OUTPUT YELLOW_LED_A SET_GPIO_OUTPUT GREEN_LED_A SET_GPIO_OUTPUT RED_LED_P SET_GPIO_OUTPUT YELLOW_LED_P SET_GPIO_OUTPUT GREEN_LED_P SET_GPIO_OUTPUT ;
-
-\ INIT_OUTPUT ( n -- ) initializes the state of the semaphore's LEDs.
-: INIT_STATE  RED_LED_A SET_GPIO_ON YELLOW_LED_A SET_GPIO_OFF GREEN_LED_A SET_GPIO_OFF RED_LED_P SET_GPIO_OFF YELLOW_LED_P SET_GPIO_OFF GREEN_LED_P SET_GPIO_ON ;
+\ LEVEL ( n -- b ) takes GPIO pin number, left shift 1 by this number, get current value of GPLEV0 register and leaves on the stack the value of the corresponding 
+\ GPIO pin number bit
+: LEVEL 1 SWAP LSHIFT GPLEV0 @ SWAP AND ;
 
 : DELAY BEGIN 1 - DUP 0 = UNTIL DROP ;
 
-: PEDESTRIAN_YELLOW GREEN_LED_P SET_GPIO_OFF YELLOW_LED_P SET_GPIO_ON ;
-: PEDESTRIAN_RED RED_LED_P SET_GPIO_ON YELLOW_LED_P SET_GPIO_OFF RED_LED_A SET_GPIO_OFF GREEN_LED_A SET_GPIO_ON ;
-: PEDESTRIAN_GREEN GREEN_LED_P SET_GPIO_ON RED_LED_P SET_GPIO_OFF YELLOW_LED_A SET_GPIO_OFF RED_LED_A SET_GPIO_ON ;
-: AUTO_YELLOW  GREEN_LED_A SET_GPIO_OFF YELLOW_LED_A SET_GPIO_ON ;
+: RED RED_CAR_LED RED_PED_LED ;
+: YELLOW YELLOW_CAR_LED YELLOW_PED_LED ;
+: GREEN GREEN_CAR_LED GREEN_PED_LED ;
+
+: CAR DROP ;
+: PEDESTRIAN SWAP DROP ;
+
+\ INIT_OUTPUT ( -- ) set the output state to the semaphore's GPIO.
+: INIT_OUTPUT 
+    RED CAR GPIO MODE OUTPUT 
+    YELLOW CAR GPIO MODE OUTPUT 
+    GREEN CAR GPIO MODE OUTPUT 
+    RED PEDESTRIAN GPIO MODE OUTPUT 
+    YELLOW PEDESTRIAN GPIO MODE OUTPUT 
+    GREEN PEDESTRIAN GPIO MODE OUTPUT 
+;
+
+\ INIT_STATE ( -- ) initializes the state of the semaphore's LEDs.
+: INIT_STATE  
+    RED CAR GPIO ON 
+    YELLOW CAR GPIO OFF 
+    GREEN CAR GPIO OFF 
+    RED PEDESTRIAN GPIO OFF
+    YELLOW PEDESTRIAN GPIO OFF 
+    GREEN PEDESTRIAN GPIO ON 
+;
 
 : SEMAPHORE_ROUTINE 
-." PEDESTRIAN_YELLOW " CR
- PEDESTRIAN_YELLOW WAIT_TIME DELAY 
- ." PEDESTRIAN_RED " CR 
- PEDESTRIAN_RED WAIT_TIME DELAY  
- ." AUTO_YELLOW " CR
- AUTO_YELLOW WAIT_TIME DELAY  
- ." PEDESTRIAN_GREEN " CR
- PEDESTRIAN_GREEN WAIT_TIME DELAY  
- 
- MAIN ;
+    ." PEDESTRIAN YELLOW " CR
+    GREEN PEDESTRIAN GPIO OFF YELLOW PEDESTRIAN GPIO ON WAIT_TIME DELAY 
+    ." PEDESTRIAN RED " CR 
+    RED PEDESTRIAN GPIO ON YELLOW PEDESTRIAN GPIO OFF RED CAR GPIO OFF GREEN CAR GPIO ON WAIT_TIME DELAY  
+    ." CAR YELLOW " CR
+    GREEN CAR GPIO OFF YELLOW CAR GPIO ON WAIT_TIME DELAY  
+    ." PEDESTRIAN GREEN " CR
+    RED CAR GPIO ON YELLOW CAR GPIO OFF RED PEDESTRIAN OFF GREEN PEDESTRIAN ON WAIT_TIME DELAY  
+;
 
-: CHECK ." Waiting for input... " CR BEGIN DUP GET_GPIO_LEV 0= UNTIL DROP SEMAPHORE_ROUTINE ;
+\ CHECK ( n -- ) busy wait until GPIO level passed as input is up and then start SEMAPHORE_ROUTINE
+: CHECK ." Waiting for input... " CR BEGIN DUP GPIO LEVEL 0= UNTIL DROP SEMAPHORE_ROUTINE ;
 
 : MAIN INIT_STATE BUTTON CHECK ;
 
