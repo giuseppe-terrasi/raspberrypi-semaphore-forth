@@ -1,4 +1,5 @@
 \ include gpio.f
+\ inlcude time.f
 
 DECIMAL
 
@@ -36,7 +37,7 @@ DECIMAL
 ;
 
 
-: LCD_PULSE  LCD_E GPIO ON 50000 DELAY LCD_E GPIO OFF ;
+: LCD_PULSE  LCD_E GPIO ON 500 MSEC DELAY LCD_E GPIO OFF ;
 
 : LCD_D_RESET
     LCD_E GPIO OFF

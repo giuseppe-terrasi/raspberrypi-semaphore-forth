@@ -1,7 +1,6 @@
 \ include gpio.f
+\ inlcude time.f
 \ include jonesforth.f
-
-100000 CONSTANT WAIT_TIME
 
 DECIMAL
 
@@ -15,7 +14,7 @@ DECIMAL
 
 5  CONSTANT BUTTON
 
-: DELAY BEGIN 1 - DUP 0 = UNTIL DROP ;
+: WAIT_TIME 5 SEC ;
 
 : RED RED_CAR_LED RED_PED_LED ;
 : YELLOW YELLOW_CAR_LED YELLOW_PED_LED ;
