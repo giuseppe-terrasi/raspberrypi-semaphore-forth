@@ -1,3 +1,5 @@
+\ include gpio.f
+
 DECIMAL
 
 \ VSS     GND
