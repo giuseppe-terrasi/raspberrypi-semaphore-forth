@@ -4,6 +4,8 @@ HEX
 3F200028 CONSTANT GPCLR0
 3F200034 CONSTANT GPLEV0
 
+DECIMAL
+
 \ GPIO ( n -- n ) takes GPIO pin number and test if is lower then 27 otherwise abort
 : GPIO DUP 30 > IF ABORT THEN ;
 
