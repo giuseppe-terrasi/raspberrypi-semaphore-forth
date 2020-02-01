@@ -26,7 +26,7 @@ DECIMAL
 \ INPUT (a b c -- ) taskes the output of MODE and then set the GPFSELN register of the corresponding GPIO as input.
 \ Same as OUTPUT but drop the not necessary shift value and the GPFSELN bit which controls GPIO input is set by the 
 \ INVERT AND operation between the current value of GPFSELN, cleared by the mask,
-: INPUT DROP INVERT AND SWAP ! ;
+: INPUT 1 SWAP LSHIFT INVERT AND SWAP ! ;
 
 \ ON ( n -- ) takes GPIO pin number, left shift 1 by this number and set the corresponding bit of GPCLR0 register
 : ON 1 SWAP LSHIFT GPCLR0 ! ;
