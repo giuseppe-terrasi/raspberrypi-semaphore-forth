@@ -1,9 +1,13 @@
 HEX
 
-3F003004 CONSTANT SYS_CLO  \ Free runner register address of System Timer
+3F003000 CONSTANT SYSCS  \ System Timer Control/Status register
+3F003004 CONSTANT SYSCLO  \ System Timer Counter Lower 32 bits register
+3F003008 CONSTANT SYSCHI  \ System Timer Counter Higher 32 bits register
+3F003010 CONSTANT SYSC1  \ System Timer Compare 1 register
+3F003018 CONSTANT SYSC3  \ System Timer Compare 3 register
 
 \ NOW ( -- n ) get time passed from startup in microseconds
-: NOW SYS_CLO @ ;
+: NOW SYSCLO @ ;
 
 DECIMAL
 
@@ -11,5 +15,20 @@ DECIMAL
 : MSEC 1000 * ; \ milliseconds
 : SEC 1000 MSEC * ; \ seconds 
 
+\ TOUSEC ( n -- n ) converts n to usec
+: TOUSEC 1 USEC / ;
+
+\ TOMSEC ( n -- n ) converts n to msec
+: TOMSEC 1 MSEC / ;
+
+\ TOSEC ( n -- n ) converts n to sec
+: TOSEC 1 SEC / ;
+
 \ DELAY ( n -- ) wait for given time passed as input
 : DELAY NOW + BEGIN DUP NOW - 0 <= UNTIL DROP ;
+
+\ ( n -- ) set System Timer Compare 1 to n + now 
+: SYSC1! NOW + SYSC1 ! ;
+
+\ ( n -- ) set System Timer Compare 3 to n + now 
+: SYSC3! NOW + SYSC3 ! ;
