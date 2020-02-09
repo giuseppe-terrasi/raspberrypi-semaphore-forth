@@ -29,10 +29,10 @@ DECIMAL
 : INPUT 1 SWAP LSHIFT INVERT AND SWAP ! ;
 
 \ ON ( n -- ) takes GPIO pin number, left shift 1 by this number and set the corresponding bit of GPCLR0 register
-: ON 1 SWAP LSHIFT GPCLR0 ! ;
+: ON 1 SWAP LSHIFT GPSET0 ! ;
 
 \ OFF ( n -- ) takes GPIO pin number, left shift 1 by this number and set the corresponding bit of GPSET0 register
-: OFF 1 SWAP LSHIFT GPSET0 ! ;
+: OFF 1 SWAP LSHIFT GPCLR0 ! ;
 
 \ LEVEL ( n -- b ) takes GPIO pin number, left shift 1 by this number, get current value of GPLEV0 register and leaves on the stack the value of the corresponding 
 \ GPIO pin number bit
