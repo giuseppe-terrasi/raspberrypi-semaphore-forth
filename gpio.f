@@ -37,3 +37,18 @@ DECIMAL
 \ LEVEL ( n -- b ) takes GPIO pin number, left shift 1 by this number, get current value of GPLEV0 register and leaves on the stack the value of the corresponding 
 \ GPIO pin number bit
 : LEVEL 1 SWAP LSHIFT GPLEV0 @ SWAP AND ;
+
+\ GPFSELOUT! shortcut for setting gpio as output
+: GPFSELOUT! GPIO MODE OUTPUT ;
+
+\ GPFSELOUT! shortcut for setting gpio as input
+: GPFSELIN! GPIO MODE INPUT ;
+
+\ GPFSELOUT! shortcut for setting gpio high
+: GPON! GPIO ON ;
+
+\ GPFSELOUT! shortcut for setting gpio low
+: GPOFF! GPIO OFF ;
+
+\ GPFSELOUT! shortcut for getting gpio level
+: GPLEV@ GPIO LEVEL ;
