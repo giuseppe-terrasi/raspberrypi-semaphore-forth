@@ -5,6 +5,7 @@ HEX
 3F003008 CONSTANT SYSCHI  \ System Timer Counter Higher 32 bits register
 3F003010 CONSTANT SYSC1  \ System Timer Compare 1 register
 3F003018 CONSTANT SYSC3  \ System Timer Compare 3 register
+3F00B210 CONSTANT IRQ1 \ Enable_IRQs_1 register 
 
 \ NOW ( -- n ) get time passed from startup in microseconds
 : NOW SYSCLO @ ;
@@ -32,3 +33,6 @@ DECIMAL
 
 \ ( n -- ) set System Timer Compare 3 to n + now 
 : SYSC3! NOW + SYSC3 ! ;
+
+\ ( -- ) Enables IRQ1 for timer
+: IRQTIMER1! IRQ1 @ 2 OR IRQ1 ! ;
