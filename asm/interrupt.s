@@ -31,6 +31,11 @@ _start:
     cmp r0, #1<<17
     bleq gpio_isr
 
+    ldr r0, addr_ITS
+    ldr r1, addr_SYS_TIMER_CLO_REG
+    ldr r1, [r1]
+    str r1, [r0]
+
     pop {r0-r3, r12, lr}
     subs pc, lr, #4
 
@@ -41,11 +46,6 @@ timer_isr:
 
     ldr r0, addr_GENERIC_FUNC
     ldr r1, addr_TIMER_FUNC
-    ldr r1, [r1]
-    str r1, [r0]
-
-    ldr r0, addr_ITS
-    ldr r1, addr_SYS_TIMER_CLO_REG
     ldr r1, [r1]
     str r1, [r0]
     bx lr
