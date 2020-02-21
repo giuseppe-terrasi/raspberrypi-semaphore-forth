@@ -55,6 +55,8 @@ DECIMAL
 \ GPFSELOUT! shortcut for getting gpio level
 : GPLEV@ GPIO LEVEL ;
 
+\ GPAFEN ( n -- ) set GPAFEN0 register for gpio pin n for async fall event 
 : GPAFEN! GPIO 1 SWAP LSHIFT GPAFEN0 ! ;
 
+\ IRQGPIO! ( -- ) enables IRQ source for gpio interrupt for 1-30 GPIO
 : IRQGPIO! 1 17 LSHIFT IRQ2 @ OR IRQ2 ! ;
