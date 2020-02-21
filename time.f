@@ -15,6 +15,7 @@ DECIMAL
 : USEC ;  \ microseconds
 : MSEC 1000 * ; \ milliseconds
 : SEC 1000 MSEC * ; \ seconds 
+: MIN 60 SEC * ; \ seconds 
 
 \ TOUSEC ( n -- n ) converts n to usec
 : TOUSEC 1 USEC / ;
