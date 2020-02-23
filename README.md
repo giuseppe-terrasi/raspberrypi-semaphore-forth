@@ -7,3 +7,7 @@ Use [this](https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Periphera
 Use [this](https://www.openhacks.com/uploadsproductos/eone-1602a1.pdf) datasheet for LCD 16X02 Display
 
 Full documentation [here](https://github.com/giuseppe-terrasi/raspberrypi-semaphore-forth/tree/master/docs)
+
+Credits:
+
+jonesforth.f was taken from the [oranix/pijFORTHos](https://github.com/organix/pijFORTHos) repository 
