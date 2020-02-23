@@ -108,5 +108,3 @@
 		." OK "
 	THEN
 ;
-WELCOME
-HIDE WELCOME

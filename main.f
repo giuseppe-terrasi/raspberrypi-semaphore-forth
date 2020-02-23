@@ -16,7 +16,7 @@ VARIABLE ACTIONS
 
 DECIMAL
 
-\ Allocates space for the 5 semaphore actions anc store the start address into 'ACTIONS' variable
+\ Allocates space for the 6 semaphore actions and store the start address into 'ACTIONS' variable
 6 CELLS ALLOT ACTIONS !
 
 \ ACTION ( n -- addr ) Returns the addres of the action at index n
@@ -77,7 +77,7 @@ DECIMAL
 ;
 
 \ 5ACTION ( -- ) Sets the next action to be executed (idx 0) and enables the manual call
-: 5ACTION 9 -4 NEXTACTION! ;
+: 5ACTION 0 -5 NEXTACTION! ;
 
 \ EXEC_NEXT ( -- ) Exec the next action which is stored at ACTION_IDX of ACTIONS array
 : EXEC_NEXT ACTION_IDX @ ACTION @ EXECUTE ;
@@ -88,6 +88,7 @@ DECIMAL
 : SET2 ' 2ACTION 2 ACTION ! ;
 : SET3 ' 3ACTION 3 ACTION ! ;
 : SET4 ' 4ACTION 4 ACTION ! ;
+: SET5 ' 5ACTION 5 ACTION ! ;
 
 \ TIMER_ISR ( -- ) this is the user side of timer interrupt service routine. It prints to the second line of the LCD the time remaining for the semaphore routine
 \ and if the action length is not expired it executes the next action in the sequence else it decrements the current action length and it Schedules TIMER_IRQ in 1 second
@@ -124,38 +125,46 @@ DECIMAL
     REPEAT
 ;
 
+\ INIT_ALL  ( -- )
+: INIT_ALL 
+    SET0
+    SET1
+    SET2
+    SET3
+    SET4
+    SET5
+
+    TIMER_ISR!
+    GPIO_ISR!
+    IRQHANDLER!
+
+    SEMSETUP
+    LCDSETUP
+
+    SEMINIT
+    LCDINIT
+
+    0 ACTION_IDX !
+    30 FULLSEMLEN !
+
+    \ Enabling  async fall event for GPIO 5, the one used by the button
+    5 GPAFEN!
+
+    \ Enabling GPIO IRQ source
+    IRQGPIO!
+
+    \ Enabling Timer IRQ source
+    IRQTIMER1!
+
+    \ Enabling all IRQs
+    +IRQ
+
+;
+
 \  --- END of definitions ---
 
-SET0
-SET1
-SET2
-SET3
-SET4
-
-TIMER_ISR!
-GPIO_ISR!
-IRQHANDLER!
-
-SEMSETUP
-LCDSETUP
-
-SEMINIT
-LCDINIT
-
-0 ACTION_IDX !
-40 FULLSEMLEN !
-
-\ Enabling  async fall event for GPIO 5, the one used by the button
-5 GPAFEN!
-
-\ Enabling GPIO IRQ source
-IRQGPIO!
-
-\ Enabling Timer IRQ source
-IRQTIMER1!
-
-\ Enabling all IRQs
-+IRQ
+\ Inizialize all
+INIT_ALL 
 
 \ Start of the endless loop
 MAINLOOP

@@ -17,15 +17,6 @@ DECIMAL
 : SEC 1000 MSEC * ; \ seconds 
 : MIN 60 SEC * ; \ seconds 
 
-\ TOUSEC ( n -- n ) converts n to usec
-: TOUSEC 1 USEC / ;
-
-\ TOMSEC ( n -- n ) converts n to msec
-: TOMSEC 1 MSEC / ;
-
-\ TOSEC ( n -- n ) converts n to sec
-: TOSEC 1 SEC / ;
-
 \ DELAY ( n -- ) wait for given time passed as input
 : DELAY NOW + BEGIN DUP NOW - 0 <= UNTIL DROP ;
 

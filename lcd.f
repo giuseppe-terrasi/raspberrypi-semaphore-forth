@@ -64,7 +64,7 @@ C0 CONSTANT LCDLN2
 \ BITSET ( n1 n2 -- flag ) Check if n2-bit of n1 is set and leaves a status flag into the stack 
 : BITSET AND 0<> ;
 
-\ ?LCDD ( flag n -- flag ) Check flag and set n-pin accordly to flag
+\ ?LCDD ( flag n -- ) Check flag and set n-pin accordly to flag
 : ?LCDD SWAP IF GPON! ELSE GPOFF! THEN ;
 
 \ LCDWRITE ( n -- ) Write n to LCD in 8 bit mode. If n < 0x100 a command is sent otherwise data are sent.
@@ -128,7 +128,7 @@ HEX
 \ LCDLN ( n -- addr ) Gets the corresponding address of LCD line passed as input 
 : LCDLN 1 = IF LCDLN1 ELSE LCDLN2 THEN ;
 
-\ LCDLN ( n -- addr ) Set DDRAM addres of LCD line where cursor will start to write
+\ LCDLN ( n -- ) Set DDRAM addres of LCD line where cursor will start to write
 : LCDLN! LCDLN + LCDWRITE ;
 
 \ LCDCURL>R ( -- ) Set cursor move from left to right
@@ -140,7 +140,7 @@ HEX
 \ LCDSTRING ( addr n1 n2 n3 -- ) Print to LCD line based on n3 the string starting from addr and long n1 from an offset of n2 from the beginning of the line
 : LCDSTRING LCDLN! LCDCURL>R LCDSTYPE ;
 
-\ LCDSTRING ( n1 n2 n3 -- ) Print to LCD line based on n3 the string rappresentation of n1 from an offset of n2 from the beginning of the line
+\ LCDNUMBER ( n1 n2 n3 -- ) Print to LCD line based on n3 the string rappresentation of n1 from an offset of n2 from the beginning of the line
 : LCDNUMBER LCDLN! LCDCURL<R LCDNTYPE ;
 
 \ LCDSPACE write a space to LCD
